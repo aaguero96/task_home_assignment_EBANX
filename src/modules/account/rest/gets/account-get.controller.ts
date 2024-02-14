@@ -5,14 +5,17 @@ import {
   Inject,
   Query,
   Res,
+  UseFilters,
 } from '@nestjs/common';
 import {
   ACCOUNT_SERVICE,
   IAccountService,
 } from '../../services/account-service.interface';
 import { Response } from 'express';
+import { AccountNotFoundFilter } from '../../filters/account-not-found.filter';
 
 @Controller()
+@UseFilters(new AccountNotFoundFilter())
 export class AccountGetController {
   constructor(
     @Inject(ACCOUNT_SERVICE) private readonly _accountService: IAccountService,

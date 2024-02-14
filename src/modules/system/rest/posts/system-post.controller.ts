@@ -14,6 +14,6 @@ export class SystemPostController {
   @Post('/reset')
   async reset(@Res() res: Response) {
     await this._systemService.reset();
-    return res.status(HttpStatus.OK).json('OK');
+    return res.status(HttpStatus.OK).end();
   }
 }

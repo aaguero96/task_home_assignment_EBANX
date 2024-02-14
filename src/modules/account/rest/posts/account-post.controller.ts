@@ -5,6 +5,7 @@ import {
   Inject,
   Post,
   Res,
+  UseFilters,
 } from '@nestjs/common';
 import {
   ACCOUNT_SERVICE,
@@ -13,6 +14,7 @@ import {
 import { EventTypeEnum } from '../../enums/event-type.enum';
 import { Response } from 'express';
 import { EventTypeNotExistsException } from '../../exceptions/event-type-not-exists.exception';
+import { AccountNotFoundFilter } from '../../filters/account-not-found.filter';
 
 @Controller()
 export class AccountPostController {
@@ -21,6 +23,7 @@ export class AccountPostController {
   ) {}
 
   @Post('/event')
+  @UseFilters(new AccountNotFoundFilter())
   async event(@Res() res: Response, @Body() request: any) {
     let response: any;
     switch (request.type) {
