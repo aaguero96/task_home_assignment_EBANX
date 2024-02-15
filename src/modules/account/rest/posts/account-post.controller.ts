@@ -41,14 +41,14 @@ export class AccountPostController {
             querryRunner.manager,
           );
           await querryRunner.commitTransaction();
-          return res.status(HttpStatus.CREATED).json(response);
+          return res.status(HttpStatus.CREATED).send(response);
 
         case EventTypeEnum.Withdraw:
           response = await this._accountService.withdraw(
             request.origin,
             request.amount,
           );
-          return res.status(HttpStatus.CREATED).json(response);
+          return res.status(HttpStatus.CREATED).send(response);
 
         case EventTypeEnum.Transfer:
           response = await this._accountService.transfer(
@@ -58,7 +58,7 @@ export class AccountPostController {
             querryRunner.manager,
           );
           await querryRunner.commitTransaction();
-          return res.status(HttpStatus.CREATED).json(response);
+          return res.status(HttpStatus.CREATED).send(response);
 
         default:
           throw new EventTypeNotExistsException();
