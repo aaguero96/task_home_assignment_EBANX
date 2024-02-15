@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { IAccountRepository } from './account-repository.interface';
-import { AccountEntity } from 'src/infra/database/entities/account.entity';
+import { AccountEntity } from '../../../infra/database/entities/account.entity';
 import { EntityManager, Repository } from 'typeorm';
 
 export class AccountRepository implements IAccountRepository {
