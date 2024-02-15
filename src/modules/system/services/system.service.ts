@@ -3,7 +3,7 @@ import { ISystemService } from './system-service.interface';
 import {
   ACCOUNT_REPOSITORY,
   IAccountRepository,
-} from 'src/modules/account/repositories/account-repository.interface';
+} from '../../account/repositories/account-repository.interface';
 
 @Injectable()
 export class SystemService implements ISystemService {
