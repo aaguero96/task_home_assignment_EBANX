@@ -15,42 +15,59 @@ import { EventTypeEnum } from '../../enums/event-type.enum';
 import { Response } from 'express';
 import { EventTypeNotExistsException } from '../../exceptions/event-type-not-exists.exception';
 import { AccountNotFoundFilter } from '../../filters/account-not-found.filter';
+import { DataSource } from 'typeorm';
 
 @Controller()
 export class AccountPostController {
   constructor(
     @Inject(ACCOUNT_SERVICE) private readonly _accountService: IAccountService,
+    private readonly _dataSource: DataSource,
   ) {}
 
   @Post('/event')
   @UseFilters(new AccountNotFoundFilter())
   async event(@Res() res: Response, @Body() request: any) {
-    let response: any;
-    switch (request.type) {
-      case EventTypeEnum.Deposit:
-        response = await this._accountService.deposit(
-          request.destination,
-          request.amount,
-        );
-        return res.status(HttpStatus.CREATED).json(response);
+    const querryRunner = this._dataSource.createQueryRunner();
+    await querryRunner.connect();
+    await querryRunner.startTransaction();
 
-      case EventTypeEnum.Withdraw:
-        response = await this._accountService.withdraw(
-          request.origin,
-          request.amount,
-        );
-        return res.status(HttpStatus.CREATED).json(response);
+    try {
+      let response: any;
+      switch (request.type) {
+        case EventTypeEnum.Deposit:
+          response = await this._accountService.deposit(
+            request.destination,
+            request.amount,
+            querryRunner.manager,
+          );
+          await querryRunner.commitTransaction();
+          return res.status(HttpStatus.CREATED).json(response);
 
-      case EventTypeEnum.Transfer:
-        response = await this._accountService.transfer(
-          request.origin,
-          request.amount,
-          request.destination,
-        );
-        return res.status(HttpStatus.CREATED).json(response);
+        case EventTypeEnum.Withdraw:
+          response = await this._accountService.withdraw(
+            request.origin,
+            request.amount,
+          );
+          return res.status(HttpStatus.CREATED).json(response);
 
-      default:
-        throw new EventTypeNotExistsException();
+        case EventTypeEnum.Transfer:
+          response = await this._accountService.transfer(
+            request.origin,
+            request.amount,
+            request.destination,
+            querryRunner.manager,
+          );
+          await querryRunner.commitTransaction();
+          return res.status(HttpStatus.CREATED).json(response);
+
+        default:
+          throw new EventTypeNotExistsException();
+      }
+    } catch (e) {
+      await querryRunner.rollbackTransaction();
+      throw e;
+    } finally {
+      await querryRunner.release();
     }
   }
 }

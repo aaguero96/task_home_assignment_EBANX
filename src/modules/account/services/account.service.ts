@@ -12,6 +12,7 @@ import {
   IAccountDomain,
 } from '../domains/account-domain.interface';
 import { AccountNotFoundException } from '../exceptions/account-not-found.exception';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class AccountService implements IAccountService {
@@ -24,14 +25,18 @@ export class AccountService implements IAccountService {
   deposit = async (
     destination: string,
     amount: number,
+    manager?: EntityManager,
   ): Promise<DepositResponseDTO> => {
     let destinationAccount = await this._accountRepo.findById(destination);
 
     if (!destinationAccount) {
-      destinationAccount = await this._accountRepo.create({
-        id: destination,
-        balance: 0,
-      });
+      destinationAccount = await this._accountRepo.create(
+        {
+          id: destination,
+          balance: 0,
+        },
+        manager,
+      );
     }
 
     this._accountDomain.depositValue(destinationAccount, amount);
@@ -39,6 +44,7 @@ export class AccountService implements IAccountService {
     await this._accountRepo.updateBalanceById(
       destinationAccount.id,
       destinationAccount.balance,
+      manager,
     );
 
     return {
@@ -72,6 +78,7 @@ export class AccountService implements IAccountService {
     origin: string,
     amount: number,
     destination: string,
+    manager?: EntityManager,
   ): Promise<TransferResponseDTO> => {
     const originAccount = await this._accountRepo.findById(origin);
     if (!originAccount) {
@@ -80,16 +87,31 @@ export class AccountService implements IAccountService {
 
     let destinationAccount = await this._accountRepo.findById(destination);
     if (!destinationAccount) {
-      destinationAccount = await this._accountRepo.create({
-        id: destination,
-        balance: 0,
-      });
+      destinationAccount = await this._accountRepo.create(
+        {
+          id: destination,
+          balance: 0,
+        },
+        manager,
+      );
     }
 
     this._accountDomain.transferValue(
       originAccount,
       amount,
       destinationAccount,
+    );
+
+    await this._accountRepo.updateBalanceById(
+      originAccount.id,
+      originAccount.balance,
+      manager,
+    );
+
+    await this._accountRepo.updateBalanceById(
+      destinationAccount.id,
+      destinationAccount.balance,
+      manager,
     );
 
     return {
