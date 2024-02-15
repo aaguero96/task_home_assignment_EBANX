@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { DBModule } from './infra/database/db.module';
 import { AccountRestModule } from './modules/account/rest/account-rest.module';
@@ -16,7 +14,5 @@ import { SystemRestModule } from './modules/system/rest/system-rest.module';
     AccountRestModule,
     SystemRestModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
