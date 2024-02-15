@@ -27,6 +27,6 @@ export class AccountGetController {
     @Query('account_id') accountId: string,
   ) {
     const response = await this._accountService.getBalanceById(accountId);
-    return res.status(HttpStatus.OK).send(response);
+    return res.status(HttpStatus.OK).json(response);
   }
 }
