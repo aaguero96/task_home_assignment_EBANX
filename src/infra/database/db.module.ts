@@ -10,7 +10,7 @@ import { join } from 'path';
       useFactory: async (configService: ConfigService) => {
         return {
           type: 'postgres',
-          logger: null,
+          logging: JSON.parse(configService.get('LOGGING_TYPEORM')),
           url: configService.get('DATABASE_URL'),
           entities: [join(__dirname, './entities/**/*.entity{.js,.ts}')],
           migrations: [join(__dirname, './migrations/**/*{.js,.ts}')],
