@@ -15,13 +15,17 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // set swagger
-  const configSwagger = new DocumentBuilder()
+  const configSwaggerBuilder = new DocumentBuilder()
     .setTitle('TASK HOME ASSIGNMENT EBANX')
     .setDescription('API for financial transactions')
     .setVersion('1.0')
-    .addServer(`http://localhost:${port}/`, 'Local')
-    .addServer('https://task-home-assignment-ebanx.onrender.com/', 'Production')
-    .build();
+    .addServer(
+      'https://task-home-assignment-ebanx.onrender.com/',
+      'Production',
+    );
+  configService.get('NODE_ENV') !== 'production' &&
+    configSwaggerBuilder.addServer(`http://localhost:${port}/`, 'Local');
+  const configSwagger = configSwaggerBuilder.build();
   const document = SwaggerModule.createDocument(app, configSwagger);
   SwaggerModule.setup('docs', app, document);
   app.enableCors({
