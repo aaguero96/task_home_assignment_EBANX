@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  app:
+    image: aaguero96/task_home_assignment_ebanx:pr-1
+    environment:
+      - NODE_ENV=
+      - DATABASE_URL=
+      - LOGGING_TYPEORM=
+      - PORT=
+    ports:
+      - 3000:3000
