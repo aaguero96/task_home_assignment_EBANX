@@ -1,0 +1,12 @@
+# tests
+*.spec.*
+
+# docker
+.dockerignore
+Dockerfile
+
+# generated files
+coverage
+dist
+node_modules
+:memory

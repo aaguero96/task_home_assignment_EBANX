@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DBModule } from './infra/database/db.module';
 import { AccountRestModule } from './modules/account/rest/account-rest.module';
 import { SystemRestModule } from './modules/system/rest/system-rest.module';
+import { HomePageController } from './home-page.controlller';
 
 @Module({
   imports: [
@@ -14,5 +15,6 @@ import { SystemRestModule } from './modules/system/rest/system-rest.module';
     AccountRestModule,
     SystemRestModule,
   ],
+  controllers: [HomePageController],
 })
 export class AppModule {}
