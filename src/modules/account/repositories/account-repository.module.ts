@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AccountEntity } from 'src/infra/database/entities/account.entity';
+import { AccountEntity } from '../../../infra/database/entities/account.entity';
 import { ACCOUNT_REPOSITORY } from './account-repository.interface';
-import { useClass } from 'src/shared/helpers/use-class.helper';
+import { useClass } from '../../../shared/helpers/use-class.helper';
 import { AccountRepository } from './account.repository';
 
 @Module({

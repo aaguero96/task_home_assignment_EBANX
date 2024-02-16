@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AccountRepositoryModule } from 'src/modules/account/repositories/account-repository.module';
-import { useClass } from 'src/shared/helpers/use-class.helper';
+import { AccountRepositoryModule } from '../../../modules/account/repositories/account-repository.module';
+import { useClass } from '../../../shared/helpers/use-class.helper';
 import { SYSTEM_SERVICE } from './system-service.interface';
 import { SystemService } from './system.service';
 
