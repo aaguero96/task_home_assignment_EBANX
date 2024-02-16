@@ -1,4 +1,4 @@
-import { AccountEntity } from 'src/infra/database/entities/account.entity';
+import { AccountEntity } from '../../../infra/database/entities/account.entity';
 
 export const ACCOUNT_DOMAIN = Symbol('ACCOUNT_DOMAIN');
 

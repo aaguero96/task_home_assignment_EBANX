@@ -1,4 +1,4 @@
-import { AccountEntity } from 'src/infra/database/entities/account.entity';
+import { AccountEntity } from '../../../infra/database/entities/account.entity';
 import { IAccountDomain } from './account-domain.interface';
 import { InsufficientFundsException } from '../exceptions/insufficient-funds.exception';
 

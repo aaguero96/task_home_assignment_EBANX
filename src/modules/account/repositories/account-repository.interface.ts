@@ -1,4 +1,4 @@
-import { AccountEntity } from 'src/infra/database/entities/account.entity';
+import { AccountEntity } from '../../../infra/database/entities/account.entity';
 import { EntityManager } from 'typeorm';
 
 export const ACCOUNT_REPOSITORY = Symbol('ACCOUNT_REPOSITORY');
