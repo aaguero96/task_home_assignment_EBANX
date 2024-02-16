@@ -1,6 +1,8 @@
 name: Publish docker image
 
-on: [pull_request]
+on:
+  release:
+    types: [published]
 
 jobs:
   push_to_registry:
