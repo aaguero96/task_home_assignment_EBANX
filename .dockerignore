@@ -10,3 +10,5 @@ coverage
 dist
 node_modules
 :memory
+
+.env
