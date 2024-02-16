@@ -20,7 +20,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: aaguero96/task_home_assignment_EBANX
+          images: aaguero96/task_home_assignment_EBANX:v1
 
       - name: Build and push docker image
         uses: docker/build-push-action@v5
