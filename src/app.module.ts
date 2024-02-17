@@ -24,6 +24,7 @@ import { LoggerModule } from 'nestjs-pino';
               target: 'pino-pretty',
               options: {
                 singleLine: true,
+                colorize: true,
               },
             },
           },
