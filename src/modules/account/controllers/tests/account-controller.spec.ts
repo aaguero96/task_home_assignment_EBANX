@@ -1,11 +1,11 @@
 import { mock, mockClear } from 'jest-mock-extended';
 import { IAccountService } from '../../services/account-service.interface';
-import { AccountPostController } from '../posts/account-post.controller';
 import { EventTypeNotExistsException } from '../../exceptions/event-type-not-exists.exception';
 import { mockRes } from '../../../../shared/helpers/mock-res.helper';
 import { createDataSourceMock } from '../../../../shared/helpers/create-data-source-mock.helper';
+import { AccountController } from '../account.controller';
 
-describe('test AccountPostController class', () => {
+describe('test AccountController', () => {
   const accountServiceMock = mock<IAccountService>();
 
   const {
@@ -19,7 +19,7 @@ describe('test AccountPostController class', () => {
     rollbackTransactionMock,
   } = createDataSourceMock();
 
-  const accountController = new AccountPostController(
+  const accountController = new AccountController(
     accountServiceMock,
     dataSourceMock,
   );
@@ -298,6 +298,35 @@ describe('test AccountPostController class', () => {
         // EXPECT
         await expect(actual).rejects.toThrow(EventTypeNotExistsException);
       });
+    });
+  });
+
+  describe('test getBalance method', () => {
+    it('call getBalanceById by AccountService once with correct args', async () => {
+      // MOCKS
+      const res = mockRes();
+      const fnGetBalanceById =
+        accountServiceMock.getBalanceById.mockResolvedValue(100);
+
+      // ACTUAL
+      await accountController.getBalance(res, '1');
+
+      // EXPECT
+      expect(fnGetBalanceById).toHaveBeenCalledTimes(1);
+      expect(fnGetBalanceById).toHaveBeenCalledWith('1');
+    });
+
+    it('response balance as json and status 200', async () => {
+      // MOCKS
+      const res = mockRes();
+      accountServiceMock.getBalanceById.mockResolvedValue(100);
+
+      // ACTUAL
+      await accountController.getBalance(res, '1');
+
+      // EXPECT
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(100);
     });
   });
 });

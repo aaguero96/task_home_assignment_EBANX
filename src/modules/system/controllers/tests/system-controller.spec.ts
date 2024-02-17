@@ -1,12 +1,12 @@
 import { mock, mockClear } from 'jest-mock-extended';
 import { mockRes } from '../../../../shared/helpers/mock-res.helper';
-import { SystemPostController } from '../posts/system-post.controller';
+import { SystemController } from '../system-post.controller';
 import { ISystemService } from '../../services/system-service.interface';
 
-describe('test SystemPostController class', () => {
+describe('test SystemController class', () => {
   const systemServiceMock = mock<ISystemService>();
 
-  const systemController = new SystemPostController(systemServiceMock);
+  const systemController = new SystemController(systemServiceMock);
 
   beforeEach(() => {
     mockClear(systemServiceMock);

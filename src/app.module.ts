@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DBModule } from './infra/database/db.module';
-import { AccountRestModule } from './modules/account/rest/account-rest.module';
-import { SystemRestModule } from './modules/system/rest/system-rest.module';
+import { AccountControllerModule } from './modules/account/controllers/account-controller.module';
+import { SystemControllerModule } from './modules/system/controllers/system-rest.module';
 import { HomePageController } from './modules/home-page/home-page.controller';
 import { LoggerModule } from 'nestjs-pino';
 
@@ -32,8 +32,8 @@ import { LoggerModule } from 'nestjs-pino';
       },
     }),
     DBModule,
-    AccountRestModule,
-    SystemRestModule,
+    AccountControllerModule,
+    SystemControllerModule,
   ],
   controllers: [HomePageController],
 })

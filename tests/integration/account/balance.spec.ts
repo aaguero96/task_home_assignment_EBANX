@@ -33,7 +33,7 @@ describe('GET /balance', () => {
   it('status 404 if account doesnt exists', async () => {
     return request(app.getHttpServer())
       .get(`/balance`)
-      .query({ account_id: '1' })
+      .query({ account_id: '105' })
       .expect(404)
       .expect((res) => {
         expect(res.body).toStrictEqual(0);
