@@ -25,15 +25,17 @@ async function bootstrap() {
       'https://aaguero-task-home-assignment-ebanx.onrender.com/',
       'Production',
     );
-  configService.get('NODE_ENV') !== 'production' &&
+  if (configService.get('NODE_ENV') !== 'production') {
     configSwaggerBuilder.addServer(`http://localhost:${port}/`, 'Local');
+    app.enableCors({
+      origin: `http://localhost:${port}`,
+      credentials: true,
+      allowedHeaders: ['*'],
+    });
+  }
   const configSwagger = configSwaggerBuilder.build();
   const document = SwaggerModule.createDocument(app, configSwagger);
   SwaggerModule.setup('docs', app, document);
-  app.enableCors({
-    origin: `http://localhost:${port}/`,
-    credentials: true,
-  });
 
   // set ports
   await app.listen(port);
