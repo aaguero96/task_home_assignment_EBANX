@@ -3,11 +3,13 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   const configService = app.get<ConfigService>(ConfigService);
+  const loggerService = app.get(Logger);
 
   const port = configService.get('PORT') || 3000;
 
@@ -35,6 +37,7 @@ async function bootstrap() {
 
   // set ports
   await app.listen(port);
-  console.log(`App running on port: ${port}`);
+  configService.get('NODE_ENV') !== 'production' &&
+    loggerService.log(`App running on port: ${port}`);
 }
 bootstrap();

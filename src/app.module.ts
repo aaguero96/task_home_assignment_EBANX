@@ -4,6 +4,7 @@ import { DBModule } from './infra/database/db.module';
 import { AccountRestModule } from './modules/account/rest/account-rest.module';
 import { SystemRestModule } from './modules/system/rest/system-rest.module';
 import { HomePageController } from './modules/home-page/home-page.controller';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { HomePageController } from './modules/home-page/home-page.controller';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    LoggerModule.forRoot(),
     DBModule,
     AccountRestModule,
     SystemRestModule,
