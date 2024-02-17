@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DBModule } from './infra/database/db.module';
 import { AccountRestModule } from './modules/account/rest/account-rest.module';
 import { SystemRestModule } from './modules/system/rest/system-rest.module';
@@ -12,7 +12,24 @@ import { LoggerModule } from 'nestjs-pino';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    LoggerModule.forRoot(),
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          pinoHttp: {
+            level:
+              configService.get('NODE_ENV') !== 'production' ? 'debug' : 'info',
+            transport: {
+              target: 'pino-pretty',
+              options: {
+                singleLine: true,
+              },
+            },
+          },
+        };
+      },
+    }),
     DBModule,
     AccountRestModule,
     SystemRestModule,
