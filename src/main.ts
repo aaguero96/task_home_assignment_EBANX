@@ -22,7 +22,7 @@ async function bootstrap() {
     .setDescription('API for financial transactions')
     .setVersion('1.0')
     .addServer(
-      'https://task-home-assignment-ebanx.onrender.com/',
+      'https://aaguero-task-home-assignment-ebanx.onrender.com/',
       'Production',
     );
   configService.get('NODE_ENV') !== 'production' &&
