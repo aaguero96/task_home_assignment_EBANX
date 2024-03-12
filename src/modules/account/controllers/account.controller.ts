@@ -17,8 +17,11 @@ import { EventTypeEnum } from '../enums/event-type.enum';
 import { Response } from 'express';
 import { EventTypeNotExistsException } from '../exceptions/event-type-not-exists.exception';
 import { AccountNotFoundFilter } from '../filters/account-not-found.filter';
-import { DataSource } from 'typeorm';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ACCOUNT_PRODUCER,
+  IAccountProducer,
+} from '../producers/account-producer.interface';
 
 @ApiTags('Account')
 @UseFilters(new AccountNotFoundFilter())
@@ -26,7 +29,8 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class AccountController {
   constructor(
     @Inject(ACCOUNT_SERVICE) private readonly _accountService: IAccountService,
-    private readonly _dataSource: DataSource,
+    @Inject(ACCOUNT_PRODUCER)
+    private readonly _accountProducer: IAccountProducer,
   ) {}
 
   @ApiBody({
@@ -61,47 +65,28 @@ export class AccountController {
   @Post('/event')
   @UseFilters(new AccountNotFoundFilter())
   async event(@Res() res: Response, @Body() request: any) {
-    const querryRunner = this._dataSource.createQueryRunner();
-    await querryRunner.connect();
-    await querryRunner.startTransaction();
+    switch (request.type) {
+      case EventTypeEnum.Deposit:
+        await this._accountProducer.deposit(
+          request.destination,
+          request.amount,
+        );
+        return res.status(HttpStatus.CREATED).send(request);
 
-    try {
-      let response: any;
-      switch (request.type) {
-        case EventTypeEnum.Deposit:
-          response = await this._accountService.deposit(
-            request.destination,
-            request.amount,
-            querryRunner.manager,
-          );
-          await querryRunner.commitTransaction();
-          return res.status(HttpStatus.CREATED).send(response);
+      case EventTypeEnum.Withdraw:
+        await this._accountProducer.withdraw(request.origin, request.amount);
+        return res.status(HttpStatus.CREATED).send(request);
 
-        case EventTypeEnum.Withdraw:
-          response = await this._accountService.withdraw(
-            request.origin,
-            request.amount,
-          );
-          return res.status(HttpStatus.CREATED).send(response);
+      case EventTypeEnum.Transfer:
+        await this._accountProducer.transfer(
+          request.origin,
+          request.amount,
+          request.destination,
+        );
+        return res.status(HttpStatus.CREATED).send(request);
 
-        case EventTypeEnum.Transfer:
-          response = await this._accountService.transfer(
-            request.origin,
-            request.amount,
-            request.destination,
-            querryRunner.manager,
-          );
-          await querryRunner.commitTransaction();
-          return res.status(HttpStatus.CREATED).send(response);
-
-        default:
-          throw new EventTypeNotExistsException();
-      }
-    } catch (e) {
-      await querryRunner.rollbackTransaction();
-      throw e;
-    } finally {
-      await querryRunner.release();
+      default:
+        throw new EventTypeNotExistsException();
     }
   }
 

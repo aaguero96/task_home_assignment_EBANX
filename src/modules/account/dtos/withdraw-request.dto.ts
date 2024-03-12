@@ -1,5 +1,4 @@
-export class TransferRequestDTO {
+export class WithdrawRequestDTO {
   origin: string;
   amount: number;
-  destination: string;
 }

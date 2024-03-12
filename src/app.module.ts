@@ -5,6 +5,9 @@ import { AccountControllerModule } from './modules/account/controllers/account-c
 import { SystemControllerModule } from './modules/system/controllers/system-rest.module';
 import { HomePageController } from './modules/home-page/home-page.controller';
 import { LoggerModule } from 'nestjs-pino';
+import { ScheduleModule } from '@nestjs/schedule';
+import { AccountConsumerModule } from './modules/account/consumers/account-consumer.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -12,6 +15,7 @@ import { LoggerModule } from 'nestjs-pino';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     LoggerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -31,8 +35,21 @@ import { LoggerModule } from 'nestjs-pino';
         };
       },
     }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          redis: {
+            host: configService.get('REDIS_HOST'),
+            port: configService.get('REDIS_PORT'),
+          },
+        };
+      },
+    }),
     DBModule,
     AccountControllerModule,
+    AccountConsumerModule,
     SystemControllerModule,
   ],
   controllers: [HomePageController],
