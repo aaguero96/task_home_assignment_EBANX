@@ -8,6 +8,7 @@ import {
   Query,
   Res,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ACCOUNT_SERVICE,
@@ -19,6 +20,7 @@ import { EventTypeNotExistsException } from '../exceptions/event-type-not-exists
 import { AccountNotFoundFilter } from '../filters/account-not-found.filter';
 import { DataSource } from 'typeorm';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from 'src/shared/guards/auth.guard';
 
 @ApiTags('Account')
 @UseFilters(new AccountNotFoundFilter())
@@ -58,9 +60,11 @@ export class AccountController {
     status: 404,
     description: 'not fount origin account for withdraw or transfer',
   })
+  @UseGuards(AuthGuard)
   @Post('/event')
   @UseFilters(new AccountNotFoundFilter())
   async event(@Res() res: Response, @Body() request: any) {
+    console.log(request);
     const querryRunner = this._dataSource.createQueryRunner();
     await querryRunner.connect();
     await querryRunner.startTransaction();

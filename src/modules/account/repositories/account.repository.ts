@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { IAccountRepository } from './account-repository.interface';
 import { AccountEntity } from '../../../infra/database/entities/account.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { DeepPartial, EntityManager, Repository } from 'typeorm';
 
 export class AccountRepository implements IAccountRepository {
   constructor(
@@ -10,7 +10,7 @@ export class AccountRepository implements IAccountRepository {
   ) {}
 
   create = async (
-    account: AccountEntity,
+    account: DeepPartial<AccountEntity>,
     manager?: EntityManager,
   ): Promise<AccountEntity> => {
     const fnExecuter = async (tem: EntityManager) => {

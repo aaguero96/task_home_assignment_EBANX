@@ -5,6 +5,7 @@ import { AccountControllerModule } from './modules/account/controllers/account-c
 import { SystemControllerModule } from './modules/system/controllers/system-rest.module';
 import { HomePageController } from './modules/home-page/home-page.controller';
 import { LoggerModule } from 'nestjs-pino';
+import { UserControllerModule } from './modules/user/controllers/user-controller.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { LoggerModule } from 'nestjs-pino';
     DBModule,
     AccountControllerModule,
     SystemControllerModule,
+    UserControllerModule,
   ],
   controllers: [HomePageController],
 })

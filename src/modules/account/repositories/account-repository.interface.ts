@@ -1,11 +1,11 @@
 import { AccountEntity } from '../../../infra/database/entities/account.entity';
-import { EntityManager } from 'typeorm';
+import { DeepPartial, EntityManager } from 'typeorm';
 
 export const ACCOUNT_REPOSITORY = Symbol('ACCOUNT_REPOSITORY');
 
 export interface IAccountRepository {
   create: (
-    account: AccountEntity,
+    account: DeepPartial<AccountEntity>,
     manager?: EntityManager,
   ) => Promise<AccountEntity>;
   updateBalanceById: (
