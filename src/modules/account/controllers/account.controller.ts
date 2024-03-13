@@ -81,7 +81,9 @@ export class AccountController {
           response = await this._accountService.withdraw(
             request.origin,
             request.amount,
+            querryRunner.manager,
           );
+          await querryRunner.commitTransaction();
           return res.status(HttpStatus.CREATED).send(response);
 
         case EventTypeEnum.Transfer:
@@ -120,6 +122,15 @@ export class AccountController {
     @Query('account_id') accountId: string,
   ) {
     const response = await this._accountService.getBalanceById(accountId);
+    return res.status(HttpStatus.OK).json(response);
+  }
+
+  @Get('/summary')
+  async accountSummary(
+    @Res() res: Response,
+    @Query('account_id') accountId: string,
+  ) {
+    const response = await this._accountService.accountSummary(accountId);
     return res.status(HttpStatus.OK).json(response);
   }
 }

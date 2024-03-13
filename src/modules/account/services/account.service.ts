@@ -13,6 +13,12 @@ import {
 } from '../domains/account-domain.interface';
 import { AccountNotFoundException } from '../exceptions/account-not-found.exception';
 import { EntityManager } from 'typeorm';
+import {
+  ACCOUNT_RECORD_REPOSITORY,
+  IAccontRecordRepository,
+} from '../repositories/account-record-repository.interface';
+import { EventTypeEnum } from '../enums/event-type.enum';
+import { AccountSummaryDTO } from '../dtos/account-summary.dto';
 
 @Injectable()
 export class AccountService implements IAccountService {
@@ -20,6 +26,8 @@ export class AccountService implements IAccountService {
     @Inject(ACCOUNT_REPOSITORY)
     private readonly _accountRepo: IAccountRepository,
     @Inject(ACCOUNT_DOMAIN) private readonly _accountDomain: IAccountDomain,
+    @Inject(ACCOUNT_RECORD_REPOSITORY)
+    private readonly _accountRecordRepo: IAccontRecordRepository,
   ) {}
 
   deposit = async (
@@ -37,6 +45,14 @@ export class AccountService implements IAccountService {
         },
         manager,
       );
+      await this._accountRecordRepo.create(
+        {
+          type: EventTypeEnum.CreateAccount,
+          destinationAccount,
+          amount: 0,
+        },
+        manager,
+      );
     }
 
     this._accountDomain.depositValue(destinationAccount, amount);
@@ -44,6 +60,14 @@ export class AccountService implements IAccountService {
     await this._accountRepo.updateBalanceById(
       destinationAccount.id,
       destinationAccount.balance,
+      manager,
+    );
+    await this._accountRecordRepo.create(
+      {
+        type: EventTypeEnum.Deposit,
+        destinationAccount,
+        amount,
+      },
       manager,
     );
 
@@ -55,6 +79,7 @@ export class AccountService implements IAccountService {
   withdraw = async (
     origin: string,
     amount: number,
+    manager?: EntityManager,
   ): Promise<WithdrawResponseDTO> => {
     const originAccount = await this._accountRepo.findById(origin);
 
@@ -67,6 +92,14 @@ export class AccountService implements IAccountService {
     await this._accountRepo.updateBalanceById(
       originAccount.id,
       originAccount.balance,
+    );
+    await this._accountRecordRepo.create(
+      {
+        type: EventTypeEnum.Withdraw,
+        originAccount,
+        amount,
+      },
+      manager,
     );
 
     return {
@@ -94,6 +127,14 @@ export class AccountService implements IAccountService {
         },
         manager,
       );
+      await this._accountRecordRepo.create(
+        {
+          type: EventTypeEnum.CreateAccount,
+          destinationAccount,
+          amount: 0,
+        },
+        manager,
+      );
     }
 
     this._accountDomain.transferValue(
@@ -114,6 +155,16 @@ export class AccountService implements IAccountService {
       manager,
     );
 
+    await this._accountRecordRepo.create(
+      {
+        type: EventTypeEnum.Transfer,
+        destinationAccount,
+        originAccount,
+        amount,
+      },
+      manager,
+    );
+
     return {
       origin: originAccount,
       destination: destinationAccount,
@@ -127,5 +178,49 @@ export class AccountService implements IAccountService {
     }
 
     return account.balance;
+  };
+
+  accountSummary = async (accountId: string): Promise<AccountSummaryDTO> => {
+    const summary = await this._accountRecordRepo.accountSummary(accountId);
+
+    return summary.reduce(
+      (acc, curr) => {
+        switch (curr.type) {
+          case EventTypeEnum.CreateAccount:
+            acc.created = true;
+            break;
+
+          case EventTypeEnum.Deposit:
+            acc.deposits.push({ amount: curr.amount });
+            break;
+
+          case EventTypeEnum.Withdraw:
+            acc.withdrawals.push({ amount: -curr.amount });
+            break;
+
+          case EventTypeEnum.Transfer:
+            acc.transfers.push({
+              toAccount: curr.destinationAccount.id,
+              fromAccount: curr.originAccount.id,
+              amount:
+                curr.originAccount.id === accountId
+                  ? -curr.amount
+                  : curr.amount,
+            });
+            break;
+
+          default:
+            break;
+        }
+
+        return acc;
+      },
+      {
+        deposits: [],
+        withdrawals: [],
+        transfers: [],
+        created: false,
+      } as AccountSummaryDTO,
+    );
   };
 }

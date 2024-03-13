@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { AccountRecordEntity } from './account-records.entity';
 
 @Entity('accounts')
 export class AccountEntity {
@@ -7,4 +8,10 @@ export class AccountEntity {
 
   @Column({ name: 'balance', type: 'float', nullable: false })
   balance: number;
+
+  @OneToMany(() => AccountRecordEntity, (record) => record.originAccount)
+  originRecords: AccountRecordEntity[];
+
+  @OneToMany(() => AccountRecordEntity, (record) => record.destinationAccount)
+  destinationRecords: AccountRecordEntity[];
 }
