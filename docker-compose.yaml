@@ -13,3 +13,5 @@ services:
     container_name: postgres_db
     env_file:
       - path: ./.env
+    ports:
+      - "5432:5432"

@@ -8,7 +8,7 @@ export class AccountDomain implements IAccountDomain {
   };
 
   withdrawValue = (account: AccountEntity, value: number): void => {
-    if (account.balance < value) {
+    if (account.balance - value < -150) {
       throw new InsufficientFundsException();
     }
 
@@ -20,7 +20,7 @@ export class AccountDomain implements IAccountDomain {
     value: number,
     accountDestination: AccountEntity,
   ): void => {
-    if (accountOrigin.balance < value) {
+    if (accountOrigin.balance - value < -150) {
       throw new InsufficientFundsException();
     }
 
