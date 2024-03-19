@@ -21,6 +21,11 @@ import { AccountNotFoundFilter } from '../filters/account-not-found.filter';
 import { DataSource } from 'typeorm';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/shared/guards/auth.guard';
+import {
+  CurrentUser,
+  CurrentUserData,
+} from 'src/shared/helpers/current-user.helper';
+import { TransactionNotAuthorized } from '../exceptions/transaction-not-authorized.exception';
 
 @ApiTags('Account')
 @UseFilters(new AccountNotFoundFilter())
@@ -63,8 +68,11 @@ export class AccountController {
   @UseGuards(AuthGuard)
   @Post('/event')
   @UseFilters(new AccountNotFoundFilter())
-  async event(@Res() res: Response, @Body() request: any) {
-    console.log(request);
+  async event(
+    @Res() res: Response,
+    @Body() request: any,
+    @CurrentUser() user: CurrentUserData,
+  ) {
     const querryRunner = this._dataSource.createQueryRunner();
     await querryRunner.connect();
     await querryRunner.startTransaction();
@@ -82,6 +90,9 @@ export class AccountController {
           return res.status(HttpStatus.CREATED).send(response);
 
         case EventTypeEnum.Withdraw:
+          if (user.accountId != request.origin) {
+            throw new TransactionNotAuthorized();
+          }
           response = await this._accountService.withdraw(
             request.origin,
             request.amount,
@@ -89,6 +100,9 @@ export class AccountController {
           return res.status(HttpStatus.CREATED).send(response);
 
         case EventTypeEnum.Transfer:
+          if (user.accountId != request.origin) {
+            throw new TransactionNotAuthorized();
+          }
           response = await this._accountService.transfer(
             request.origin,
             request.amount,

@@ -33,7 +33,11 @@ export class UserService implements IUserService {
     const account = await this._accountRepo.create({ balance: 0 }, manager);
     this._userDomain.create(user, account);
     await this._userRepo.create(user, manager);
-    return this._authService.createToken({ username: user.username });
+    return this._authService.createToken({
+      username: user.username,
+      id: user.id,
+      accountId: user.account.id,
+    });
   };
 
   login = async (
@@ -48,6 +52,10 @@ export class UserService implements IUserService {
       throw new UserUnauthorizedException();
     }
 
-    return this._authService.createToken({ username: user.username });
+    return this._authService.createToken({
+      username: user.username,
+      id: user.id,
+      accountId: user.account.id,
+    });
   };
 }
