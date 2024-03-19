@@ -19,6 +19,8 @@ import { EventTypeNotExistsException } from '../exceptions/event-type-not-exists
 import { AccountNotFoundFilter } from '../filters/account-not-found.filter';
 import { DataSource } from 'typeorm';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { DepositRequestDTO } from '../dtos/deposit-request.dto';
+import { requestValidator } from 'src/shared/helpers/request-validator.helper';
 
 @ApiTags('Account')
 @UseFilters(new AccountNotFoundFilter())
@@ -69,6 +71,7 @@ export class AccountController {
       let response: any;
       switch (request.type) {
         case EventTypeEnum.Deposit:
+          await requestValidator(DepositRequestDTO, request);
           response = await this._accountService.deposit(
             request.destination,
             request.amount,
